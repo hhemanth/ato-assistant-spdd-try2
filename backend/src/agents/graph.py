@@ -133,6 +133,53 @@ class _PIINode(_PlaceholderNode):
     name = "pii_node"
 
 
+class _Slice1PiiStub:
+    """Slice 1 stand-in for the real ``pii_node`` (T070, lands in Slice 2).
+
+    Writes a minimal ``query`` row so downstream nodes (``retrieval_node``,
+    ``generation_node``, ``finalize_node``) can FK to it. No PII handling
+    yet — sets ``pii_outcome='clean'`` and ``masked_text=original_text``.
+    Slice 2's real pii_node replaces this with proper PII detection +
+    masking + refusal-on-integral.
+    """
+
+    name = "pii_node"
+    model_identity: str | None = None
+    model_version: str | None = None
+
+    def __init__(
+        self,
+        session_factory: Callable[[], AbstractAsyncContextManager[AsyncSession]],
+    ) -> None:
+        self._session_factory = session_factory
+
+    async def __call__(self, state: ChatTurnState) -> ChatTurnState:
+        """Insert a ``query`` row keyed by ``state['query_id']``; pass state through."""
+        # Local imports — keep DB layer off the agents-module import graph.
+        from db.repos.query import QueryRepo  # noqa: PLC0415
+
+        original_text = state["original_text"]
+        async with self._session_factory() as session:
+            repo = QueryRepo(session)
+            row = await repo.create_with_pii_outcome(
+                session_id=state["session_id"],
+                masked_text=original_text,
+                pii_outcome="clean",
+                pii_scanner_version="slice1-stub",
+                pii_detected=[],
+                language_detected="en",
+            )
+            await session.flush()
+        # Update state with the row's actual UUID + masked_text mirror.
+        return {
+            **state,
+            "query_id": row.id,
+            "masked_text": original_text,
+            "pii_detected": [],
+            "pii_outcome": "clean",
+        }
+
+
 class _ScopeSafetyNode(_PlaceholderNode):
     name = "scope_safety_node"
 
@@ -200,7 +247,11 @@ def build_graph(
     )
 
     # ---- Pass-through placeholders for later-slice guard nodes ------------
-    pii_node = _PIINode()
+    # pii_node is the one exception: it must write a `query` row so the
+    # downstream FK constraints succeed in Slice 1. Slice 2 (T070) replaces
+    # this stub with the real PII-detection + masking + refusal-on-integral
+    # implementation.
+    pii_node = _Slice1PiiStub(session_factory=deps.session_factory)
     scope_safety_node = _ScopeSafetyNode()
     citation_check_node = _CitationCheckNode()
     scoring_node = _ScoringNode()

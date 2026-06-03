@@ -114,9 +114,12 @@ async def post_chat(request: ChatRequest) -> ChatResponse:
     # in unrelated environments (e.g. metadata-only tooling).
     from disclaimers.templates import PER_ANSWER  # noqa: PLC0415
 
-    query_id = uuid4()
+    # The query row is created by the pii_node (T070, currently the
+    # Slice 1 stub in `agents.graph._Slice1PiiStub`); the final
+    # ``state["query_id"]`` is the canonical id everything else FKs to.
+    # We seed with a transient uuid that the pii_node overwrites.
     initial_state: ChatTurnState = {
-        "query_id": query_id,
+        "query_id": uuid4(),
         "session_id": request.session_id,
         "original_text": request.text,
         "received_at": datetime.now(tz=UTC),
@@ -128,6 +131,8 @@ async def post_chat(request: ChatRequest) -> ChatResponse:
     # as ChatTurnState. Cast for downstream type checking; ``.get``
     # access works either way.
     result = cast("ChatTurnState", raw_result)
+    # Authoritative id is whatever the pii_node wrote into the DB.
+    query_id = result["query_id"]
 
     refusal = result.get("refusal")
     if refusal is not None:

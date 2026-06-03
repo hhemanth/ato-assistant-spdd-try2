@@ -1,0 +1,69 @@
+"""Typed application settings loaded from environment / .env.local.
+
+All runtime configuration is centralised here so that every other module
+imports a single, validated :class:`Settings` instance via
+:func:`get_settings`. The fields mirror ``backend/.env.example`` 1:1; any
+new variable added to the env template MUST appear here with an explicit
+type and (when applicable) a default.
+
+Secrets are typed as ``SecretStr`` so they cannot be accidentally logged
+or serialised by the FastAPI OpenAPI generator.
+"""
+
+from __future__ import annotations
+
+from functools import lru_cache
+
+from pydantic import PostgresDsn, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """Process-wide configuration loaded from the environment.
+
+    Loading order (pydantic-settings v2 default precedence):
+
+    1. Explicit constructor arguments (used in tests).
+    2. Environment variables (case-insensitive match on the field name).
+    3. Variables present in ``.env.local`` at the working directory.
+
+    Unknown variables are rejected (``extra="forbid"``) so that typos in
+    ``.env.local`` fail fast rather than silently being ignored.
+    """
+
+    model_config = SettingsConfigDict(
+        env_file=".env.local",
+        env_file_encoding="utf-8",
+        extra="forbid",
+        case_sensitive=False,
+    )
+
+    # --- Supabase (Sydney ap-southeast-2) ---
+    supabase_db_url: PostgresDsn
+    supabase_service_role_key: SecretStr
+
+    # --- Anthropic Claude (US-hosted direct API) ---
+    anthropic_api_key: SecretStr
+
+    # --- Voyage AI embeddings (US-hosted) ---
+    voyage_api_key: SecretStr
+
+    # --- LangSmith observability (US-hosted) ---
+    langsmith_api_key: SecretStr
+    langchain_project: str = "ato-assistant-dev"
+    langchain_tracing_v2: bool = True
+
+    # --- Frontend CORS origin (optional override of the dev default) ---
+    frontend_origin: str | None = None
+
+
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    """Return the cached process-wide :class:`Settings` instance.
+
+    The cache guarantees a single validation pass per process and a
+    stable identity for downstream consumers (handy in tests that
+    monkeypatch a field).
+    """
+
+    return Settings()

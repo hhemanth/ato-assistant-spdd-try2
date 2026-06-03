@@ -49,7 +49,7 @@ each story can be implemented, tested, and demonstrated independently.
 - [X] T006 [P] Create environment templates: `backend/.env.example` (SUPABASE_DB_URL, SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY, VOYAGE_API_KEY, LANGSMITH_API_KEY, LANGCHAIN_PROJECT, LANGCHAIN_TRACING_V2) and `frontend/.env.example` (NEXT_PUBLIC_BACKEND_BASE_URL)
 - [X] T007 [P] Bootstrap GitHub Actions CI at `.github/workflows/ci.yml` with three jobs: `backend` (uses `astral-sh/setup-uv@v4`, runs `uv sync --all-groups`, then ruff / mypy / pytest via `uv run`), `frontend` (eslint, vitest, playwright), `contracts` (OpenAPI drift check). Cache `~/.cache/uv` keyed on `backend/uv.lock`. Initial jobs run lint only; test gates added in later phases.
 - [X] T008 [P] Add pre-commit configuration at `.pre-commit-config.yaml` covering ruff, mypy (manual stage), eslint, prettier, end-of-file-fixer, trailing-whitespace
-- [ ] T009 Create Supabase project in `ap-southeast-2` (Sydney) and record connection string in the team password manager; document in `backend/README.md` how to obtain the connection string for local dev
+- [X] T009 Create Supabase project in `ap-southeast-2` (Sydney) and record connection string in the team password manager; document in `backend/README.md` how to obtain the connection string for local dev
 
 ---
 

@@ -120,14 +120,14 @@ complete.
 - [X] T046 [US1] Wire all of the above nodes into the graph at `backend/src/agents/graph.py` (replace the T023 placeholders) and add conditional edges for refusal routing
 - [X] T047 [US1] Implement the `POST /chat` route at `backend/src/api/chat_route.py` — accepts `ChatRequest`, invokes the LangGraph, returns `AnswerResponse` or `RefusalResponse`
 - [ ] T048 [US1] Implement the `GET /system-info` route at `backend/src/api/system_info_route.py` returning the `SystemInfo` payload (LLM identity/version/region, embedding identity/version/region, observability identity/region, index version, last refresh, corpus scope)
-- [ ] T049 [P] [US1] Implement the typed chat client wrapper at `frontend/src/lib/chatClient.ts` and its mirrored types at `frontend/src/lib/types.ts` (generated from / mirrored against `contracts/api-chat.openapi.yaml`)
+- [X] T049 [P] [US1] Implement the typed chat client wrapper at `frontend/src/lib/chatClient.ts` and its mirrored types at `frontend/src/lib/types.ts` (generated from / mirrored against `contracts/api-chat.openapi.yaml`)
 - [X] T050 [P] [US1] Implement `frontend/src/components/PredominantDisclaimer.tsx` rendering the disclaimer with appropriate ARIA role and contrast
 - [X] T051 [P] [US1] Implement `frontend/src/components/PerAnswerDisclaimer.tsx` rendered beneath every answer
 - [X] T052 [P] [US1] Implement `frontend/src/components/CitationList.tsx` rendering numbered links to `source_url` plus the source freshness date (FR-006)
 - [ ] T053 [P] [US1] Implement `frontend/src/components/RefusalCard.tsx` rendering the refusal text + reason code in an accessible card
-- [ ] T054 [US1] Implement `frontend/src/components/ChatPanel.tsx` orchestrating input, the predominant disclaimer banner, answer + citations + per-answer disclaimer, and refusal cards
-- [ ] T055 [US1] Implement `frontend/src/app/layout.tsx` to mount the predominant disclaimer in the shell so it is visible before any chat input
-- [ ] T056 [US1] Implement `frontend/src/app/page.tsx` rendering the `ChatPanel`
+- [X] T054 [US1] Implement `frontend/src/components/ChatPanel.tsx` orchestrating input, the predominant disclaimer banner, answer + citations + per-answer disclaimer, and refusal cards
+- [X] T055 [US1] Implement `frontend/src/app/layout.tsx` to mount the predominant disclaimer in the shell so it is visible before any chat input
+- [X] T056 [US1] Implement `frontend/src/app/page.tsx` rendering the `ChatPanel`
 
 **Checkpoint**: User Story 1 (MVP) is fully functional and independently testable.
 

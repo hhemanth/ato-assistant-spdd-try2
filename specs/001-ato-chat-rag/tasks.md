@@ -117,8 +117,8 @@ complete.
 - [ ] T043a [US1] Wire `stale-source` refusal: in `backend/src/agents/citation_check/citation_node.py`, when any citation's `liveness_status == 'stale'`, set `state["refusal"]` with reason `stale-source` and route via the refusal router (T024); ensure the integration test T030a passes
 - [ ] T044 [US1] Implement the refusal node at `backend/src/agents/refusal_node.py` — accepts a refusal reason code from upstream, writes the `refusal` row, builds the typed refusal payload
 - [X] T045 [US1] Implement the finalize node at `backend/src/agents/finalize_node.py` — writes the `answer` row, writes `citation` rows, writes the `audit_record` row with processing-region fields, attaches the per-answer disclaimer text
-- [ ] T046 [US1] Wire all of the above nodes into the graph at `backend/src/agents/graph.py` (replace the T023 placeholders) and add conditional edges for refusal routing
-- [ ] T047 [US1] Implement the `POST /chat` route at `backend/src/api/chat_route.py` — accepts `ChatRequest`, invokes the LangGraph, returns `AnswerResponse` or `RefusalResponse`
+- [X] T046 [US1] Wire all of the above nodes into the graph at `backend/src/agents/graph.py` (replace the T023 placeholders) and add conditional edges for refusal routing
+- [X] T047 [US1] Implement the `POST /chat` route at `backend/src/api/chat_route.py` — accepts `ChatRequest`, invokes the LangGraph, returns `AnswerResponse` or `RefusalResponse`
 - [ ] T048 [US1] Implement the `GET /system-info` route at `backend/src/api/system_info_route.py` returning the `SystemInfo` payload (LLM identity/version/region, embedding identity/version/region, observability identity/region, index version, last refresh, corpus scope)
 - [ ] T049 [P] [US1] Implement the typed chat client wrapper at `frontend/src/lib/chatClient.ts` and its mirrored types at `frontend/src/lib/types.ts` (generated from / mirrored against `contracts/api-chat.openapi.yaml`)
 - [X] T050 [P] [US1] Implement `frontend/src/components/PredominantDisclaimer.tsx` rendering the disclaimer with appropriate ARIA role and contrast

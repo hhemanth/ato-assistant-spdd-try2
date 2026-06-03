@@ -48,10 +48,16 @@ class Settings(BaseSettings):
     # --- Voyage AI embeddings (US-hosted) ---
     voyage_api_key: SecretStr
 
-    # --- LangSmith observability (US-hosted) ---
+    # --- LangSmith observability ---
+    # Uses LangSmith's modern LANGSMITH_* env-var naming (the SDK
+    # switched from LANGCHAIN_* in late 2024). `langsmith_endpoint` is
+    # optional and accepts the regional endpoints; setting it to
+    # https://apac.api.smith.langchain.com routes traces through the
+    # APAC region, which is materially closer to AU users.
     langsmith_api_key: SecretStr
-    langchain_project: str = "ato-assistant-dev"
-    langchain_tracing_v2: bool = True
+    langsmith_project: str = "ato-assistant-dev"
+    langsmith_tracing: bool = True
+    langsmith_endpoint: str | None = None
 
     # --- Frontend CORS origin (optional override of the dev default) ---
     frontend_origin: str | None = None

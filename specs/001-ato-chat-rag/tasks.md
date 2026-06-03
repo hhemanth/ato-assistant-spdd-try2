@@ -41,7 +41,7 @@ each story can be implemented, tested, and demonstrated independently.
 
 **Purpose**: Skeleton repos, tooling, env configuration, CI bootstrap.
 
-- [ ] T001 Create the two-tier project skeleton: `backend/` and `frontend/` directories per the project structure in `plan.md`
+- [X] T001 Create the two-tier project skeleton: `backend/` and `frontend/` directories per the project structure in `plan.md`
 - [ ] T002 [P] Initialize the Python 3.12 backend with UV (Astral): run `uv init` in `backend/` to scaffold `pyproject.toml`, then declare runtime dependencies (FastAPI 0.115+, LangGraph, LangChain core, anthropic, voyageai, supabase, psycopg, SQLAlchemy 2.x, presidio-analyzer, presidio-anonymizer, httpx, trafilatura, selectolax, protego, langsmith, pydantic-settings, uvicorn) and a `dev` extras group (pytest, pytest-asyncio, respx, ruff, mypy). Pin Python to 3.12 in `[tool.uv]`. Run `uv lock` and commit `backend/uv.lock`.
 - [ ] T003 [P] Initialize Next.js 16 frontend with `frontend/package.json` declaring next@16, react@19, react-dom@19, typescript@5, tailwindcss@4, shadcn-ui, vitest, @testing-library/react, @playwright/test, @axe-core/playwright, eslint, eslint-plugin-jsx-a11y, prettier
 - [ ] T004 [P] Configure backend lint and type-check: `backend/pyproject.toml` ruff + mypy configuration, strict mode

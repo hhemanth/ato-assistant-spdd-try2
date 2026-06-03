@@ -91,23 +91,23 @@ complete.
 
 ### Tests for User Story 1 (write FIRST, observe FAIL before any T036+ implementation task)
 
-- [ ] T025 [P] [US1] Contract test for `POST /chat` answer shape at `backend/tests/contract/test_chat_answer_shape.py` — validates response against `contracts/api-chat.openapi.yaml` `AnswerResponse` schema
+- [X] T025 [P] [US1] Contract test for `POST /chat` answer shape at `backend/tests/contract/test_chat_answer_shape.py` — validates response against `contracts/api-chat.openapi.yaml` `AnswerResponse` schema
 - [ ] T026 [P] [US1] Contract test for `POST /chat` refusal shape at `backend/tests/contract/test_chat_refusal_shape.py`
 - [ ] T027 [P] [US1] Contract test for `GET /system-info` at `backend/tests/contract/test_system_info_shape.py`
-- [ ] T028 [P] [US1] Integration test — cited-answer flow over seed corpus at `backend/tests/integration/test_us1_cited_answer.py`
+- [X] T028 [P] [US1] Integration test — cited-answer flow over seed corpus at `backend/tests/integration/test_us1_cited_answer.py`
 - [ ] T029 [P] [US1] Integration test — refusal when no source covers the query at `backend/tests/integration/test_us1_no_source_refusal.py`
 - [ ] T030 [P] [US1] Integration test — refusal when citation-alignment check rejects the answer at `backend/tests/integration/test_us1_citation_misalignment_refusal.py`
 - [ ] T030a [P] [US1] Integration test — `stale-source` refusal when a cited URL fails the liveness check (returns non-2xx) at `backend/tests/integration/test_us1_stale_source_refusal.py`
 - [ ] T031 [P] [US1] Integration test — citation `source_url` MUST match `^https://www\.ato\.gov\.au/` at `backend/tests/integration/test_us1_citation_domain_filter.py`
-- [ ] T032 [P] [US1] Frontend unit test — `PredominantDisclaimer` renders at session entry at `frontend/tests/unit/PredominantDisclaimer.test.tsx`
-- [ ] T033 [P] [US1] Frontend unit test — `PerAnswerDisclaimer` renders alongside every answer at `frontend/tests/unit/PerAnswerDisclaimer.test.tsx`
-- [ ] T034 [P] [US1] Frontend e2e — cited-answer happy path at `frontend/tests/e2e/us1_cited_answer.spec.ts`
+- [X] T032 [P] [US1] Frontend unit test — `PredominantDisclaimer` renders at session entry at `frontend/tests/unit/PredominantDisclaimer.test.tsx`
+- [X] T033 [P] [US1] Frontend unit test — `PerAnswerDisclaimer` renders alongside every answer at `frontend/tests/unit/PerAnswerDisclaimer.test.tsx`
+- [X] T034 [P] [US1] Frontend e2e — cited-answer happy path at `frontend/tests/e2e/us1_cited_answer.spec.ts`
 - [ ] T035 [P] [US1] Frontend e2e — refusal card displayed for no-source case at `frontend/tests/e2e/us1_refusal.spec.ts`
 
 ### Implementation for User Story 1
 
 - [ ] T036 [P] [US1] Implement seed-corpus loader at `backend/src/ingestion/seed_corpus_loader.py` that reads HTML files from `backend/data/seed_corpus/*.html` and inserts `source_document` + `chunk` rows (uses the embedder from T038)
-- [ ] T037 [P] [US1] Hand-curate a seed corpus of 8-12 ATO HTML pages (tax-free threshold, income tax brackets, GST basics, BAS basics) at `backend/data/seed_corpus/` — pages saved as fetched HTML with their source URL recorded in a sibling `manifest.yaml`
+- [X] T037 [P] [US1] Hand-curate a seed corpus of 8-12 ATO HTML pages (tax-free threshold, income tax brackets, GST basics, BAS basics) at `backend/data/seed_corpus/` — pages saved as fetched HTML with their source URL recorded in a sibling `manifest.yaml`
 - [ ] T038 [P] [US1] Implement the Voyage embedder at `backend/src/ingestion/embedder/voyage_embedder.py` — batched embeddings, returns the configured embedding dimension verified in T010
 - [ ] T039 [P] [US1] Implement the pgvector retrieval client at `backend/src/agents/retrieval/pgvector_client.py` — top-k cosine search with a hard `is_superseded = false` filter and a hard `source_url LIKE 'https://www.ato.gov.au/%'` filter (FR-012)
 - [ ] T040 [US1] Implement the retrieval node at `backend/src/agents/retrieval/retrieval_node.py` — embeds the query, calls the retrieval client, writes a `retrieval` row, returns updated state

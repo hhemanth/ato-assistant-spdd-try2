@@ -85,3 +85,25 @@ plugins = ["pydantic.mypy"]
 # rather than scattering `# type: ignore` through every entity module.
 module = "pgvector.*"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# trafilatura and PyYAML ship without type stubs; the seed-corpus loader
+# (T036) is the only module that touches them and its public surface is
+# narrow (one ``trafilatura.extract`` call, one ``yaml.safe_load`` call).
+# Adding the official stub packages would inflate the dev-dependency
+# graph for a single internal entry point; suppressing here mirrors the
+# pgvector pattern above.
+module = ["trafilatura.*", "yaml"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# The Voyage AI SDK ships without ``__all__`` re-exports in its
+# top-level ``__init__.py``; mypy's strict mode (``implicit_reexport =
+# false``) therefore rejects ``from voyageai import AsyncClient`` even
+# though the symbol is reachable at runtime. The ingestion embedder is
+# the only module that touches it; relaxing implicit re-export and
+# missing-imports here keeps the SDK seam typed without polluting the
+# global mypy config.
+module = ["voyageai", "voyageai.*"]
+ignore_missing_imports = true
+implicit_reexport = true

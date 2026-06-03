@@ -1,0 +1,51 @@
+[project]
+name = "ato-assistant-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { email = "hhemanth@gmail.com" }
+]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "anthropic>=0.105.2",
+    "fastapi>=0.115",
+    "httpx>=0.28.1",
+    "langchain-core>=1.4.0",
+    "langgraph>=1.2.4",
+    "langsmith>=0.8.8",
+    "presidio-analyzer>=2.2.362",
+    "presidio-anonymizer>=2.2.362",
+    "protego>=0.6.0",
+    "psycopg[binary]>=3.3.4",
+    "pydantic-settings>=2.14.1",
+    "selectolax>=0.4.10",
+    "sqlalchemy>=2.0",
+    "supabase>=2.30.1",
+    "trafilatura>=2.0.0",
+    "uvicorn[standard]>=0.48.0",
+    "voyageai>=0.3.7",
+]
+
+[project.scripts]
+ato-assistant-backend = "ato_assistant_backend:main"
+
+[build-system]
+requires = ["uv_build>=0.11.16,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+# Python toolchain pin: enforced by `requires-python = ">=3.12,<3.13"` above
+# and `backend/.python-version = "3.12"`. UV resolves both before provisioning
+# the venv. No `python = ...` key is accepted in [tool.uv] (it's a CLI-config
+# table, not a Python-pin table).
+required-version = ">=0.11.16"
+
+[dependency-groups]
+dev = [
+    "mypy>=2.1.0",
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.4.0",
+    "respx>=0.23.1",
+    "ruff>=0.15.15",
+]

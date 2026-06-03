@@ -9,31 +9,14 @@
  * (tooltips, refresh actions). Currently renders pure markup but the
  * `'use client'` boundary is locked in to avoid future churn.
  *
- * Type strategy: `@/lib/types` (T049) does not exist yet. We define a
- * minimal `Citation` here matching the OpenAPI `Citation` schema and
- * export it so T049 can re-export from `@/lib/types`. The import
- * direction can be inverted later without touching consumers.
+ * Type strategy: T049 landed `@/lib/types` as the canonical mirror of
+ * the OpenAPI schemas, so `Citation` and `LivenessStatus` are imported
+ * from there. Re-exporting them keeps any older `@/components/CitationList`
+ * importers source-compatible without forking the type definition.
  */
+import type { Citation, LivenessStatus } from '@/lib/types';
 
-export type LivenessStatus = 'live' | 'unknown' | 'stale';
-
-export interface Citation {
-  /** Matches the [N] marker in the rendered answer text. */
-  index: number;
-  /** Absolute https URL into www.ato.gov.au. */
-  source_url: string;
-  /** Optional in-page anchor fragment (without the leading `#`). */
-  anchor?: string | null;
-  /** Short excerpt of the cited passage. */
-  snippet: string;
-  /**
-   * Page's `Last-Modified` value at index time. Surfaces FR-006 source
-   * freshness. `null` when the page omitted the header.
-   */
-  source_last_modified?: string | null;
-  /** Liveness flag from the retrieval/freshness check. */
-  liveness_status: LivenessStatus;
-}
+export type { Citation, LivenessStatus };
 
 export interface CitationListProps {
   citations: Citation[];

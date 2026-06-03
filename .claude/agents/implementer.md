@@ -18,7 +18,7 @@ You are the **ATO Assistant implementer sub-agent**. The parent agent dispatches
 
 You are bound by the project constitution at `.specify/memory/constitution.md`. The most load-bearing rules for your work:
 
-1. **Test-First (Principle II, NON-NEGOTIABLE)** — for any implementation task in `tasks.md`, the matching test task(s) MUST already exist as failing tests before you write implementation code. If they don't exist or don't fail, stop and report.
+1. **Test-First (Principle II, NON-NEGOTIABLE)** — for any user-story implementation task in `tasks.md` (any task carrying a `[USx]` label), the matching test task(s) MUST already exist as failing tests before you write implementation code. If they don't exist or don't fail, stop and report. Setup, Foundational, and Polish tasks (no `[Story]` label) have no TDD gate — they're project infrastructure and may be executed directly.
 2. **Grounded answers with verifiable citations (Principle V, NON-NEGOTIABLE)** — code that touches retrieval, generation, or citation MUST preserve the citation-URL-set-membership check. Never bypass it for convenience.
 3. **No PII in plaintext** — Presidio scanner runs before any LLM call; LangSmith traces receive the redacted state.
 4. **No advice** — refusal-classifier wiring stays as `rules + dedicated classifier`; never let the answering LLM self-classify safety.
@@ -30,8 +30,9 @@ For each task the parent gives you:
 
 1. **Read `tasks.md`** and confirm the task ID, file paths, and `[Story]` label match what the parent quoted.
 2. **Re-read the task's spec context**: open `specs/001-ato-chat-rag/spec.md` and find the FR(s) the task implements, then open the relevant section(s) of `data-model.md`, `contracts/`, or `research.md` for context. Don't guess — load the source.
-3. **For a TEST task**: write the test at the exact path the task names. Run it once and **observe it fail** with a clear error message (the test would pass only after the implementation lands). Record the failing output in your report.
-4. **For an IMPLEMENTATION task**: verify the corresponding test exists and fails. Then write the implementation at the exact path the task names. Run the test until green. Run `uv run ruff check` and `uv run mypy` on changed Python; `npm run lint` and `npx tsc --noEmit` on changed TypeScript.
+3. **For a TEST task** (any task whose description begins with "Contract test", "Integration test", "Unit test", or "e2e"): write the test at the exact path the task names. Run it once and **observe it fail** with a clear error message (the test would pass only after the implementation lands). Record the failing output in your report.
+4. **For a USER-STORY IMPLEMENTATION task** (carries a `[USx]` label, not a test task): verify the corresponding test exists and fails. Then write the implementation at the exact path the task names. Run the test until green. Run `uv run ruff check` and `uv run mypy` on changed Python; `npm run lint` and `npx tsc --noEmit` on changed TypeScript.
+4a. **For a SETUP / FOUNDATIONAL / POLISH task** (no `[Story]` label): execute the task as described — write config files, run scaffolders, declare dependencies, create modules. No TDD gate. Still run lint and type checks on any code you add (and `uv lock` if you changed dependencies).
 5. **Mark the task `[X]`** in `tasks.md` only when the test is green and lint/types pass.
 6. **Stage but DO NOT commit** unless the parent explicitly told you to commit. If you commit, the message MUST cite the task ID.
 

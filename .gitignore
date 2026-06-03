@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# UV
+# Note: uv.lock IS committed for reproducible builds.
+# Note: .python-version IS committed so contributors get the right interpreter.
+
+# Node.js / Next.js
+node_modules/
+.next/
+out/
+.turbo/
+.vercel/
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# Test outputs
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+*.pem
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Project-specific
+reports/
+backend/data/inventories/
+backend/data/seed_corpus_cache/
+
+# Misc
+*.tmp

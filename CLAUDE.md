@@ -9,6 +9,17 @@ content from `ato.gov.au`, with inline citations.
 The project Constitution at `.specify/memory/constitution.md` is authoritative.
 This file defers to it when in conflict.
 
+## Active Feature
+<!-- SPECKIT START -->
+- Feature: `001-ato-chat-rag` — ATO Chat with Cited Answers and RAG Pipeline
+- Spec: [`specs/001-ato-chat-rag/spec.md`](./specs/001-ato-chat-rag/spec.md)
+- Plan: [`specs/001-ato-chat-rag/plan.md`](./specs/001-ato-chat-rag/plan.md)
+- Research (Phase 0): [`specs/001-ato-chat-rag/research.md`](./specs/001-ato-chat-rag/research.md)
+- Data model: [`specs/001-ato-chat-rag/data-model.md`](./specs/001-ato-chat-rag/data-model.md)
+- Contracts: [`specs/001-ato-chat-rag/contracts/`](./specs/001-ato-chat-rag/contracts/)
+- Quickstart: [`specs/001-ato-chat-rag/quickstart.md`](./specs/001-ato-chat-rag/quickstart.md)
+<!-- SPECKIT END -->
+
 ## Workflow (Spec Kit)
 All feature work flows through:
 `/speckit.specify` → `/speckit.clarify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`

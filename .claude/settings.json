@@ -1,0 +1,77 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash(bash *)",
+
+      "Bash(uv:*)",
+      "Bash(uv *)",
+      "Bash(uvx:*)",
+      "Bash(uvx *)",
+      "Bash(pytest*)",
+      "Bash(python -m *)",
+      "Bash(ruff:*)",
+      "Bash(ruff *)",
+      "Bash(mypy:*)",
+      "Bash(mypy *)",
+
+      "Bash(npm:*)",
+      "Bash(npm *)",
+      "Bash(npx:*)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(node:*)",
+
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git branch*)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git add *)",
+      "Bash(git commit -m *)",
+      "Bash(git commit -F *)",
+      "Bash(git stash*)",
+      "Bash(git restore *)",
+      "Bash(git remote*)",
+      "Bash(git rev-parse*)",
+      "Bash(git config --get *)",
+
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(touch *)",
+      "Bash(chmod *)",
+      "Bash(echo *)",
+
+      "Bash(psql *)",
+
+      "WebFetch",
+      "WebSearch"
+    ],
+    "deny": [
+      "Bash(rm -rf*)",
+      "Bash(rm -fr*)",
+      "Bash(rm /*)",
+      "Bash(git push*)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(git clean -fd*)",
+      "Bash(git branch -D*)",
+      "Bash(git checkout --*)",
+      "Bash(git restore .*)",
+      "Bash(supabase db reset*)",
+      "Bash(:(){:|:&};:)"
+    ]
+  }
+}

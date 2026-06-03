@@ -278,3 +278,102 @@ async def seeded_chunks(
         "source_url": _FAKE_ATO_URL,
         "session_id": uuid4(),
     }
+
+
+# ---------------------------------------------------------------------------
+# Graph fixture: builds the real LangGraph against the mocked HTTP layer +
+# the test's transactional session, and registers it with the chat route's
+# injection seam (``set_graph_for_tests``). Tests that depend on this
+# fixture exercise the full LangGraph topology end-to-end while every
+# external call is intercepted by respx and every DB write lives inside
+# the outer transactional rollback.
+# ---------------------------------------------------------------------------
+
+
+@pytest_asyncio.fixture()
+async def test_graph(
+    db_session: "object",
+    mocked_anthropic: "object",
+    voyage_embedding: list[float],
+) -> "AsyncIterator[object]":
+    """Build a LangGraph wired to a stub embedder + mocked Anthropic + the
+    test's transactional session.
+
+    Notes:
+
+    * The Anthropic SDK uses httpx, so the ``mocked_anthropic`` respx
+      fixture intercepts its HTTP calls cleanly.
+    * The ``voyageai`` SDK does NOT use httpx (it uses its own internal
+      HTTP layer that respx can't see), so we replace the embedder
+      itself with a tiny stub that returns the deterministic vector.
+      The ``VoyageEmbedder`` class is exercised separately by unit
+      tests; here we only need the embeddings the retrieval node
+      depends on.
+    * All graph nodes that ``async with self.session_factory() as session:``
+      receive the same ``db_session`` instance via a thin
+      context-manager wrapper, so every write the graph performs
+      lives inside the outer rollback.
+
+    Yields the compiled graph and clears the test-injection seam on
+    teardown.
+    """
+
+    from contextlib import asynccontextmanager
+
+    from agents.graph import GraphDeps, build_graph  # type: ignore[import-not-found]
+    from agents.retrieval.pgvector_client import (  # type: ignore[import-not-found]
+        PgVectorClient,
+    )
+    from anthropic import AsyncAnthropic
+    from api.chat_route import set_graph_for_tests  # type: ignore[import-not-found]
+
+    @asynccontextmanager
+    async def _session_cm() -> "AsyncIterator[object]":
+        """Yield the test's transactional session without closing it."""
+
+        yield db_session
+
+    def session_factory() -> "object":
+        return _session_cm()
+
+    class _StubEmbedder:
+        """Tiny VoyageEmbedder stand-in: always returns the seeded vector."""
+
+        model: str = "voyage-3-large"
+        output_dimension: int = 1024
+
+        def __init__(self, vec: list[float]) -> None:
+            self._vec = vec
+
+        async def embed_query(self, text: str) -> list[float]:
+            return list(self._vec)
+
+        async def embed_document(self, text: str) -> list[float]:
+            return list(self._vec)
+
+        async def embed_texts(
+            self,
+            texts: list[str],
+            input_type: str = "document",
+        ) -> list[list[float]]:
+            return [list(self._vec) for _ in texts]
+
+    embedder = _StubEmbedder(voyage_embedding)
+    retrieval_client = PgVectorClient(session_factory=session_factory)  # type: ignore[arg-type]
+    anthropic_client = AsyncAnthropic(api_key="test")
+
+    deps = GraphDeps(
+        session_factory=session_factory,  # type: ignore[arg-type]
+        embedder=embedder,
+        retrieval_client=retrieval_client,
+        anthropic_client=anthropic_client,
+        processing_region_llm="us-east-1",
+        processing_region_embedding="unknown",
+        processing_region_observability="apac",
+    )
+    graph = build_graph(deps)
+    set_graph_for_tests(graph)
+    try:
+        yield graph
+    finally:
+        set_graph_for_tests(None)

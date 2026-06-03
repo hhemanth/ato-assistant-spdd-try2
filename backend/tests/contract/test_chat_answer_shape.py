@@ -28,12 +28,16 @@ _ALLOWED_LIVENESS = {"live", "unknown", "stale"}
 
 
 @pytest.mark.asyncio
-async def test_post_chat_returns_answer_response_matching_contract() -> None:
+async def test_post_chat_returns_answer_response_matching_contract(
+    test_graph: object,
+    seeded_chunks: dict[str, object],
+) -> None:
     """Post a simple chat request, verify the AnswerResponse contract.
 
-    Required failure today: the placeholder route returns
-    ``501 Not Implemented`` so the first assertion fails. The remaining
-    assertions document the post-implementation contract surface.
+    ``test_graph`` (conftest) builds the real LangGraph against mocked
+    Voyage + Anthropic HTTP layers and registers it with the chat
+    route's injection seam. ``seeded_chunks`` provides one
+    source_document + chunk so retrieval has something to return.
     """
 
     payload = {

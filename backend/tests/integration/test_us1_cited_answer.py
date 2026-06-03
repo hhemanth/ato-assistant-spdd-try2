@@ -32,11 +32,19 @@ from disclaimers.templates import PER_ANSWER  # type: ignore[import-not-found]
 
 @pytest.mark.asyncio
 async def test_cited_answer_flow_writes_audit_and_citation(
-    request: pytest.FixtureRequest,
-    mocked_voyage: object,
-    mocked_anthropic: object,
+    test_graph: object,
+    seeded_chunks: dict[str, object],
+    db_session: object,
 ) -> None:
-    """Drive a full chat turn end-to-end and assert audit + citation linkage."""
+    """Drive a full chat turn end-to-end and assert audit + citation linkage.
+
+    ``test_graph`` (conftest) builds the real LangGraph against mocked
+    Voyage + Anthropic HTTP layers and registers it with the chat route's
+    injection seam. ``seeded_chunks`` must be requested EAGERLY so the
+    chunk lands in the DB before the POST kicks off retrieval (lazy
+    ``request.getfixturevalue`` would seed only after the POST returned
+    a no-source refusal).
+    """
 
     session_id = uuid.uuid4()
     payload = {
@@ -47,10 +55,6 @@ async def test_cited_answer_flow_writes_audit_and_citation(
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post("/chat", json=payload)
 
-    # First gate: must reach the real LangGraph (currently 501). The
-    # assertion runs BEFORE we pull in the DB-dependent fixtures so the
-    # failure mode is the intended 501→200 mismatch even when the live
-    # DB driver isn't installed.
     assert response.status_code == 200, (
         f"POST /chat must reach the real LangGraph; got "
         f"{response.status_code}: {response.text}"
@@ -60,15 +64,10 @@ async def test_cited_answer_flow_writes_audit_and_citation(
     assert body["kind"] == "answer", body
     query_id = uuid.UUID(body["query_id"])
 
-    # The rendered answer text MUST embed the per-answer disclaimer (FR-003).
+    # The per-answer disclaimer (FR-003) MUST be present.
     assert PER_ANSWER in body["per_answer_disclaimer"], body["per_answer_disclaimer"]
 
-    # --- DB assertions — only reached after the implementation lands ---
-    # Pull DB-bound fixtures lazily so the 501→200 assertion above can
-    # fail cleanly on machines without a live Supabase connection.
-    seeded = request.getfixturevalue("seeded_chunks")
-    db_session = request.getfixturevalue("db_session")
-    seeded_url = str(seeded["source_url"])
+    seeded_url = str(seeded_chunks["source_url"])
 
     # audit_record row was written for this query_id.
     audit_row = (

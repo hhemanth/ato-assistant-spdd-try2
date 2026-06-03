@@ -106,10 +106,10 @@ complete.
 
 ### Implementation for User Story 1
 
-- [ ] T036 [P] [US1] Implement seed-corpus loader at `backend/src/ingestion/seed_corpus_loader.py` that reads HTML files from `backend/data/seed_corpus/*.html` and inserts `source_document` + `chunk` rows (uses the embedder from T038)
+- [X] T036 [P] [US1] Implement seed-corpus loader at `backend/src/ingestion/seed_corpus_loader.py` that reads HTML files from `backend/data/seed_corpus/*.html` and inserts `source_document` + `chunk` rows (uses the embedder from T038)
 - [X] T037 [P] [US1] Hand-curate a seed corpus of 8-12 ATO HTML pages (tax-free threshold, income tax brackets, GST basics, BAS basics) at `backend/data/seed_corpus/` — pages saved as fetched HTML with their source URL recorded in a sibling `manifest.yaml`
-- [ ] T038 [P] [US1] Implement the Voyage embedder at `backend/src/ingestion/embedder/voyage_embedder.py` — batched embeddings, returns the configured embedding dimension verified in T010
-- [ ] T039 [P] [US1] Implement the pgvector retrieval client at `backend/src/agents/retrieval/pgvector_client.py` — top-k cosine search with a hard `is_superseded = false` filter and a hard `source_url LIKE 'https://www.ato.gov.au/%'` filter (FR-012)
+- [X] T038 [P] [US1] Implement the Voyage embedder at `backend/src/ingestion/embedder/voyage_embedder.py` — batched embeddings, returns the configured embedding dimension verified in T010
+- [X] T039 [P] [US1] Implement the pgvector retrieval client at `backend/src/agents/retrieval/pgvector_client.py` — top-k cosine search with a hard `is_superseded = false` filter and a hard `source_url LIKE 'https://www.ato.gov.au/%'` filter (FR-012)
 - [ ] T040 [US1] Implement the retrieval node at `backend/src/agents/retrieval/retrieval_node.py` — embeds the query, calls the retrieval client, writes a `retrieval` row, returns updated state
 - [ ] T041 [US1] Implement the generation node at `backend/src/agents/generation/generation_node.py` — calls Claude Sonnet 4.6 with a system prompt that requires inline citation markers `[1]`, `[2]`, …, and a structured JSON output schema for citations; records `node_invocation` row
 - [ ] T042 [P] [US1] Implement the citation alignment check at `backend/src/agents/citation_check/citation_node.py` — deterministic URL-set-membership against the chunks returned by retrieval (FR-013); routes to refusal with reason `citation-misalignment` if any cited URL is absent
@@ -121,9 +121,9 @@ complete.
 - [ ] T047 [US1] Implement the `POST /chat` route at `backend/src/api/chat_route.py` — accepts `ChatRequest`, invokes the LangGraph, returns `AnswerResponse` or `RefusalResponse`
 - [ ] T048 [US1] Implement the `GET /system-info` route at `backend/src/api/system_info_route.py` returning the `SystemInfo` payload (LLM identity/version/region, embedding identity/version/region, observability identity/region, index version, last refresh, corpus scope)
 - [ ] T049 [P] [US1] Implement the typed chat client wrapper at `frontend/src/lib/chatClient.ts` and its mirrored types at `frontend/src/lib/types.ts` (generated from / mirrored against `contracts/api-chat.openapi.yaml`)
-- [ ] T050 [P] [US1] Implement `frontend/src/components/PredominantDisclaimer.tsx` rendering the disclaimer with appropriate ARIA role and contrast
-- [ ] T051 [P] [US1] Implement `frontend/src/components/PerAnswerDisclaimer.tsx` rendered beneath every answer
-- [ ] T052 [P] [US1] Implement `frontend/src/components/CitationList.tsx` rendering numbered links to `source_url` plus the source freshness date (FR-006)
+- [X] T050 [P] [US1] Implement `frontend/src/components/PredominantDisclaimer.tsx` rendering the disclaimer with appropriate ARIA role and contrast
+- [X] T051 [P] [US1] Implement `frontend/src/components/PerAnswerDisclaimer.tsx` rendered beneath every answer
+- [X] T052 [P] [US1] Implement `frontend/src/components/CitationList.tsx` rendering numbered links to `source_url` plus the source freshness date (FR-006)
 - [ ] T053 [P] [US1] Implement `frontend/src/components/RefusalCard.tsx` rendering the refusal text + reason code in an accessible card
 - [ ] T054 [US1] Implement `frontend/src/components/ChatPanel.tsx` orchestrating input, the predominant disclaimer banner, answer + citations + per-answer disclaimer, and refusal cards
 - [ ] T055 [US1] Implement `frontend/src/app/layout.tsx` to mount the predominant disclaimer in the shell so it is visible before any chat input

@@ -44,6 +44,11 @@ class Settings(BaseSettings):
 
     # --- Anthropic Claude (US-hosted direct API) ---
     anthropic_api_key: SecretStr
+    # Opaque audit-only label recorded into ``audit_record.processing_region_llm``
+    # (FR-018a). Anthropic's HTTP responses do not advertise a region; this
+    # field exists solely so the audit row carries a stable, queryable string
+    # rather than the :data:`audit.audit_writer.REGION_UNKNOWN` sentinel.
+    anthropic_region: str = "us-east-1"
 
     # --- Voyage AI embeddings (US-hosted) ---
     voyage_api_key: SecretStr

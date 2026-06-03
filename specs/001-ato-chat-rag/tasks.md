@@ -76,8 +76,8 @@ complete.
 - [X] T020 [P] Implement the LangSmith trace-redaction wrapper at `backend/src/observability/langsmith_redactor.py` that replaces any state field containing PII with the redaction token before tracing
 - [X] T021 [P] Author disclaimer templates at `backend/src/disclaimers/templates.py` with two strings: `PREDOMINANT` (APP 8 cross-border notice + general scope-and-purpose statement) and `PER_ANSWER` ("This information is sourced from ato.gov.au and is not personal advice — consult a registered tax agent for advice on your specific situation"). Both versioned (`DISCLAIMER_VERSION` constant).
 - [X] T022 [P] Define typed protocol for LangGraph nodes at `backend/src/agents/node_protocol.py` — a `Protocol` class declaring `name`, `model_identity` (Optional), `model_version` (Optional), and `__call__(state) -> state` so each node has an explicit, testable interface (Principle III)
-- [ ] T023 Wire an empty LangGraph `StateGraph` at `backend/src/agents/graph.py` that imports all node placeholders, declares the topology from `research.md` (input_guard.pii → input_guard.scope_safety → retrieval → generation → citation_check → scoring → finalize), and exposes `build_graph()` returning a compiled graph
-- [ ] T024 Implement the refusal-routing helper at `backend/src/agents/refusal_router.py` (a conditional edge that routes to a single `refusal_node` whenever `state["refusal"]` is set)
+- [X] T023 Wire an empty LangGraph `StateGraph` at `backend/src/agents/graph.py` that imports all node placeholders, declares the topology from `research.md` (input_guard.pii → input_guard.scope_safety → retrieval → generation → citation_check → scoring → finalize), and exposes `build_graph()` returning a compiled graph
+- [X] T024 Implement the refusal-routing helper at `backend/src/agents/refusal_router.py` (a conditional edge that routes to a single `refusal_node` whenever `state["refusal"]` is set)
 
 **Checkpoint**: Foundation ready — user-story implementation can now begin.
 

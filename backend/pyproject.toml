@@ -14,6 +14,7 @@ dependencies = [
     "langchain-core>=1.4.0",
     "langgraph>=1.2.4",
     "langsmith>=0.8.8",
+    "pgvector>=0.4.2",
     "presidio-analyzer>=2.2.362",
     "presidio-anonymizer>=2.2.362",
     "protego>=0.6.0",
@@ -48,6 +49,7 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "respx>=0.23.1",
     "ruff>=0.15.15",
+    "sqlparse>=0.5.5",
 ]
 
 [tool.ruff]
@@ -59,6 +61,12 @@ select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "ASYNC", "S", "PL"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
+# Repository CRUD methods have one keyword-only argument per table column
+# by design — ``PLR0913`` (too-many-args) does not model that shape well.
+# The package ``__init__`` also intentionally defers the ``config.settings``
+# import to the call site to keep the import graph env-var-free for unit
+# tests; ``PLC0415`` would force that import to the top of the file.
+"src/db/repos/*.py" = ["PLR0913", "PLC0415"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -69,3 +77,11 @@ warn_return_any = true
 no_implicit_optional = true
 disallow_untyped_decorators = true
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# pgvector ships without a py.typed marker; SQLAlchemy 2.x integration
+# is the only API surface we touch and its column types compose cleanly
+# with our Mapped[...] annotations. Suppress the missing-stubs error
+# rather than scattering `# type: ignore` through every entity module.
+module = "pgvector.*"
+ignore_missing_imports = true

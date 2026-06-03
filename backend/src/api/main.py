@@ -1,10 +1,8 @@
 """FastAPI application skeleton.
 
-This module assembles the FastAPI app used by Uvicorn. Concrete business
-endpoints (``POST /chat`` and ``GET /system-info``) are registered here
-as **placeholders** that return HTTP 501 so the generated OpenAPI
-surface already mirrors ``specs/001-ato-chat-rag/contracts/api-chat.openapi.yaml``.
-Real implementations land in later tasks (T047, T048).
+This module assembles the FastAPI app used by Uvicorn. ``POST /chat``
+is implemented in :mod:`api.chat_route` (T047); ``GET /system-info``
+remains a placeholder until T048 lands.
 
 The build is wrapped in :func:`build_app` so tests can construct an
 isolated app instance without depending on import-time side effects.
@@ -19,15 +17,15 @@ import time
 from collections.abc import Awaitable, Callable
 from datetime import datetime
 from importlib.metadata import PackageNotFoundError, metadata, version
-from typing import Annotated, Any, Literal
-from uuid import UUID
+from typing import Literal
 
 from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from api.chat_route import chat_router
 from config.settings import get_settings
 
 # ---------------------------------------------------------------------------
@@ -124,85 +122,11 @@ class StructuredLoggingMiddleware(BaseHTTPMiddleware):
 # Pydantic models mirroring contracts/api-chat.openapi.yaml
 # ---------------------------------------------------------------------------
 
-# NOTE: These models mirror `specs/001-ato-chat-rag/contracts/api-chat.openapi.yaml`.
-# T047 (POST /chat) and T048 (GET /system-info) will wire real behaviour.
-# Keep these schemas in sync with the contract — the OpenAPI drift check
-# (T141) compares the live FastAPI schema against the YAML contract.
-
-
-class ChatRequest(BaseModel):
-    """User-submitted question. Validated before any LLM is reached."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    text: str = Field(
-        ...,
-        min_length=1,
-        max_length=4000,
-        description="User's question. Server runs the PII guard before any LLM call.",
-    )
-    session_id: UUID = Field(
-        ...,
-        description="Client-generated stable id for the browser session.",
-    )
-
-
-class Citation(BaseModel):
-    """A single citation rendered alongside an answer."""
-
-    index: int = Field(..., ge=1, description="Matches the [N] marker in `text`.")
-    source_url: str = Field(
-        ...,
-        pattern=r"^https://www\.ato\.gov\.au/",
-        description="MUST be an ato.gov.au URL.",
-    )
-    anchor: str | None = None
-    snippet: str
-    source_last_modified: datetime | None = None
-    liveness_status: Literal["live", "unknown", "stale"]
-
-
-class AnswerResponse(BaseModel):
-    """A grounded answer with citations and confidence badge."""
-
-    kind: Literal["answer"] = "answer"
-    query_id: UUID
-    text: str = Field(
-        ...,
-        description="Rendered answer. Contains inline citation markers like [1], [2].",
-    )
-    citations: list[Citation] = Field(..., min_length=1)
-    confidence_band: Literal["high", "medium", "low"]
-    per_answer_disclaimer: str
-    model_identity: str = Field(..., description="e.g., claude-sonnet-4-6.")
-    generated_at: datetime
-
-
-class RefusalResponse(BaseModel):
-    """A typed refusal payload — never an HTTP error."""
-
-    kind: Literal["refusal"] = "refusal"
-    query_id: UUID
-    reason_code: Literal[
-        "no-source",
-        "low-confidence",
-        "citation-misalignment",
-        "stale-source",
-        "pii-integral",
-        "pii-scanner-fail",
-        "out-of-scope",
-        "inappropriate",
-        "personal-advice",
-        "non-english",
-    ]
-    user_message: str
-    refused_at: datetime
-
-
-ChatResponse = Annotated[
-    AnswerResponse | RefusalResponse,
-    Field(discriminator="kind"),
-]
+# ChatRequest / Citation / AnswerResponse / RefusalResponse / ChatResponse
+# live in :mod:`api.models` so :mod:`api.chat_route` can import them
+# without a circular dependency back through this module. Keep
+# SystemInfo + Error here for now — T048 lifts SystemInfo to api.models
+# when GET /system-info ships.
 
 
 class SystemInfo(BaseModel):
@@ -305,28 +229,10 @@ def build_app() -> FastAPI:
     async def version_endpoint() -> VersionResponse:
         return VersionResponse(name=_PACKAGE_NAME, version=_package_version())
 
-    # --- Contract placeholders (T047, T048) ---
-    @app.post(
-        "/chat",
-        operation_id="postChat",
-        tags=["chat"],
-        summary="Ask a question. Returns a cited answer or a refusal.",
-        responses={
-            200: {"model": AnswerResponse, "description": "Answer or refusal."},
-            400: {"model": Error},
-            429: {"model": Error},
-            500: {"model": Error},
-            501: {"model": Error, "description": "Placeholder until T047 lands."},
-        },
-    )
-    async def post_chat(_request: ChatRequest) -> Response:
-        # TODO(T047): replace with real LangGraph invocation. The body type is
-        # validated to keep the OpenAPI schema honest in the meantime.
-        return JSONResponse(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            content=_NOT_IMPLEMENTED_PAYLOAD,
-        )
+    # --- POST /chat (T047) ---
+    app.include_router(chat_router)
 
+    # --- Contract placeholder (T048) ---
     @app.get(
         "/system-info",
         operation_id="getSystemInfo",
@@ -346,9 +252,5 @@ def build_app() -> FastAPI:
 
     return app
 
-
-# Type the schema overrides so mypy doesn't complain about the
-# discriminated union plumbed through the responses dict.
-_: dict[str, Any] = {"ChatResponse": ChatResponse}  # keep ChatResponse exported
 
 app = build_app()

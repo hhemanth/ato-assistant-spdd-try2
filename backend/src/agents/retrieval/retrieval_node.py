@@ -120,9 +120,7 @@ class RetrievalNode:
 
         started_at = datetime.now(tz=UTC)
         query_embedding = await self._embedder.embed_query(query_text)
-        retrieved = await self._retrieval_client.top_k(
-            query_embedding, k=self._top_k
-        )
+        retrieved = await self._retrieval_client.top_k(query_embedding, k=self._top_k)
         finished_at = datetime.now(tz=UTC)
 
         # Write the ``retrieval`` row + the ``node_invocation`` audit row
@@ -134,9 +132,7 @@ class RetrievalNode:
                 query_id=query_id,
                 top_k=self._top_k,
                 chunk_ids=[chunk["chunk_id"] for chunk in retrieved],
-                similarities=[
-                    Decimal(str(chunk["similarity"])) for chunk in retrieved
-                ],
+                similarities=[Decimal(str(chunk["similarity"])) for chunk in retrieved],
                 embedding_model_version=self._embedder.model,
             )
 

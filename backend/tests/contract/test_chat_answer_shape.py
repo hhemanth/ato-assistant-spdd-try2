@@ -50,8 +50,7 @@ async def test_post_chat_returns_answer_response_matching_contract(
 
     # First gate — the placeholder returns 501; the eventual contract is 200.
     assert response.status_code == 200, (
-        f"POST /chat must return 200 AnswerResponse, got "
-        f"{response.status_code}: {response.text}"
+        f"POST /chat must return 200 AnswerResponse, got {response.status_code}: {response.text}"
     )
 
     body = response.json()

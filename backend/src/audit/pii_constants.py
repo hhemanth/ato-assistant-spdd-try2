@@ -118,9 +118,7 @@ def redaction_token_for_classes(pii_classes: list[str]) -> str:
 #:
 #: The payload character class accepts the canonical class names plus
 #: ``+`` for joined-class tokens and ``PII`` for the generic fallback.
-REDACTION_TOKEN_REGEX: Final[re.Pattern[str]] = re.compile(
-    r"<REDACTED:[A-Z][A-Z0-9+]*>"
-)
+REDACTION_TOKEN_REGEX: Final[re.Pattern[str]] = re.compile(r"<REDACTED:[A-Z][A-Z0-9+]*>")
 
 
 __all__ = [

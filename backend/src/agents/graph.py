@@ -319,9 +319,7 @@ def build_graph(
     return g.compile()
 
 
-def build_default_graph() -> CompiledStateGraph[
-    ChatTurnState, None, ChatTurnState, ChatTurnState
-]:
+def build_default_graph() -> CompiledStateGraph[ChatTurnState, None, ChatTurnState, ChatTurnState]:
     """Build the production graph from :func:`config.settings.get_settings`.
 
     Lazily imports :mod:`anthropic` and the embedder / retrieval client

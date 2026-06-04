@@ -222,12 +222,14 @@ async def _load_entry(
     # Voyage's per-request ceiling internally.
     embeddings = await embedder.embed_texts(chunks, input_type="document")
     if len(embeddings) != len(chunks):
-        return False, 0, {
-            "slug": slug,
-            "error": (
-                f"embedder returned {len(embeddings)} vectors for {len(chunks)} chunks"
-            ),
-        }
+        return (
+            False,
+            0,
+            {
+                "slug": slug,
+                "error": (f"embedder returned {len(embeddings)} vectors for {len(chunks)} chunks"),
+            },
+        )
 
     content_hash = hashlib.sha256(main_text.encode("utf-8")).digest()
     fetched_at = _parse_iso8601(str(entry["fetched_at"]))

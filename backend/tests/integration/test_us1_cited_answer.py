@@ -56,8 +56,7 @@ async def test_cited_answer_flow_writes_audit_and_citation(
         response = await client.post("/chat", json=payload)
 
     assert response.status_code == 200, (
-        f"POST /chat must reach the real LangGraph; got "
-        f"{response.status_code}: {response.text}"
+        f"POST /chat must reach the real LangGraph; got {response.status_code}: {response.text}"
     )
 
     body = response.json()

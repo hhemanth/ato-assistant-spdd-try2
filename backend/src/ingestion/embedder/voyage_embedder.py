@@ -114,9 +114,7 @@ class VoyageEmbedder:
             # graph so unit tests that mock the embedder don't pay for it.
             import voyageai  # noqa: PLC0415
 
-            self._client = voyageai.AsyncClient(
-                api_key=self._api_key.get_secret_value()
-            )
+            self._client = voyageai.AsyncClient(api_key=self._api_key.get_secret_value())
         return self._client
 
     async def embed_texts(

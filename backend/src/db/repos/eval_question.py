@@ -57,9 +57,7 @@ class EvalQuestion(Base):
     topic: Mapped[str] = mapped_column(Text, nullable=False)
     difficulty: Mapped[str] = mapped_column(Text, nullable=False)
     author: Mapped[str] = mapped_column(Text, nullable=False)
-    expected_refusal_reason: Mapped[str | None] = mapped_column(
-        Text, nullable=True, default=None
-    )
+    expected_refusal_reason: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
     expected_citation_urls: Mapped[list[str]] = mapped_column(
         ARRAY(Text),
         nullable=False,
@@ -109,9 +107,7 @@ class EvalQuestionInput:
 class EvalQuestionRepo(RepoBase):
     """Typed bulk-load + lookups for ``eval_question``."""
 
-    async def bulk_upsert(
-        self, questions: Sequence[EvalQuestionInput]
-    ) -> list[EvalQuestion]:
+    async def bulk_upsert(self, questions: Sequence[EvalQuestionInput]) -> list[EvalQuestion]:
         """Insert a batch of golden-set rows."""
         rows: list[EvalQuestion] = []
         for q in questions:

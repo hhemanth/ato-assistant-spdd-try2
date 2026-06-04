@@ -102,7 +102,7 @@ SYSTEM_PROMPT: str = (
     "You are the ATO Assistant answering Australian tax questions "
     "using ONLY the provided ATO sources. Every factual claim MUST "
     "cite a numbered source via [N] inline, matching the citations "
-    'list. If the sources do not cover the question, return '
+    "list. If the sources do not cover the question, return "
     '`{ "answer": "", "citations": [] }`.'
 )
 
@@ -138,8 +138,7 @@ _CITE_ANSWER_TOOL_DICT: dict[str, Any] = {
                             "type": "integer",
                             "minimum": 1,
                             "description": (
-                                "1-based footnote index matching a [N] "
-                                "marker in the answer text."
+                                "1-based footnote index matching a [N] marker in the answer text."
                             ),
                         },
                         "source_url": {
@@ -159,9 +158,7 @@ _CITE_ANSWER_TOOL_DICT: dict[str, Any] = {
 }
 
 
-def _build_user_message(
-    masked_query: str, chunks: list[RetrievedChunk]
-) -> str:
+def _build_user_message(masked_query: str, chunks: list[RetrievedChunk]) -> str:
     """Render the user message — the masked query plus a numbered list
     of retrieved chunks.
 
@@ -210,9 +207,7 @@ def _parse_tool_use_block(
     return answer_text, proposed
 
 
-def _parse_text_response(
-    answer_text: str, chunks: list[RetrievedChunk]
-) -> list[ProposedCitation]:
+def _parse_text_response(answer_text: str, chunks: list[RetrievedChunk]) -> list[ProposedCitation]:
     """Build the proposed-citations list from a plain-text answer.
 
     Each ``[N]`` marker in ``answer_text`` is resolved to a URL via
@@ -236,8 +231,7 @@ def _parse_text_response(
         return []
 
     reference_map: dict[int, str] = {
-        int(m.group(1)): m.group(2)
-        for m in _REFERENCE_LINE_RE.finditer(answer_text)
+        int(m.group(1)): m.group(2) for m in _REFERENCE_LINE_RE.finditer(answer_text)
     }
 
     proposed: list[ProposedCitation] = []
@@ -347,9 +341,7 @@ class GenerationNode:
         if not chunks:
             state["refusal"] = RefusalState(
                 reason_code="no-source",
-                user_message=(
-                    "I couldn't find an ATO source covering this question."
-                ),
+                user_message=("I couldn't find an ATO source covering this question."),
                 produced_by_node="generation_node",
             )
             return state
@@ -410,9 +402,7 @@ class GenerationNode:
         if not answer_text or not proposed_citations:
             state["refusal"] = RefusalState(
                 reason_code="no-source",
-                user_message=(
-                    "I couldn't find an ATO source covering this question."
-                ),
+                user_message=("I couldn't find an ATO source covering this question."),
                 produced_by_node="generation_node",
             )
             return state

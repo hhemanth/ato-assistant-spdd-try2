@@ -85,9 +85,7 @@ class PgVectorClient:
         """The URL prefix forwarded to the repo's hard filter."""
         return self._corpus_scope
 
-    async def top_k(
-        self, query_embedding: list[float], k: int = 8
-    ) -> list[RetrievedChunk]:
+    async def top_k(self, query_embedding: list[float], k: int = 8) -> list[RetrievedChunk]:
         """Return the top-``k`` chunks for ``query_embedding`` (FR-012).
 
         Hard-restricted by ``corpus_scope`` (FR-012) and the

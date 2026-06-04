@@ -21,9 +21,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base, RepoBase
 
 ACTUAL_OUTCOMES: frozenset[str] = frozenset({"answer", "refusal"})
-VERDICTS: frozenset[str] = frozenset(
-    {"pass", "fail", "refused_correct", "refused_incorrect"}
-)
+VERDICTS: frozenset[str] = frozenset({"pass", "fail", "refused_correct", "refused_incorrect"})
 
 
 class EvalResult(Base):
@@ -59,9 +57,7 @@ class EvalResult(Base):
     citation_correctness: Mapped[Decimal | None] = mapped_column(
         Numeric, nullable=True, default=None
     )
-    groundedness: Mapped[Decimal | None] = mapped_column(
-        Numeric, nullable=True, default=None
-    )
+    groundedness: Mapped[Decimal | None] = mapped_column(Numeric, nullable=True, default=None)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
 
     __table_args__ = (

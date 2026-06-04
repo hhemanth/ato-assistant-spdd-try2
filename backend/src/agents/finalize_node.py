@@ -205,9 +205,7 @@ class FinalizeNode:
                         snippet=chunk["snippet"],
                         liveness_status=SLICE1_LIVENESS_STATUS,
                         anchor=proposed.get("anchor"),
-                        source_last_modified_at_cite=chunk.get(
-                            "source_last_modified"
-                        ),
+                        source_last_modified_at_cite=chunk.get("source_last_modified"),
                         liveness_checked_at=None,
                     )
                 )
@@ -221,9 +219,7 @@ class FinalizeNode:
                 )
 
             if citation_inputs:
-                await citation_repo.create_many(
-                    answer_id=answer_row.id, citations=citation_inputs
-                )
+                await citation_repo.create_many(answer_id=answer_row.id, citations=citation_inputs)
 
             finished_at = datetime.now(tz=UTC)
             await audit_writer.write_node_timing(

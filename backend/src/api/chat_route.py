@@ -50,9 +50,7 @@ if TYPE_CHECKING:
 _graph_cache: dict[str, CompiledStateGraph[ChatTurnState, None, ChatTurnState, ChatTurnState]] = {}
 
 
-def _get_graph() -> CompiledStateGraph[
-    ChatTurnState, None, ChatTurnState, ChatTurnState
-]:
+def _get_graph() -> CompiledStateGraph[ChatTurnState, None, ChatTurnState, ChatTurnState]:
     """Return the cached production graph; build on first use."""
     graph = _graph_cache.get("graph")
     if graph is None:
@@ -65,8 +63,7 @@ def _get_graph() -> CompiledStateGraph[
 
 
 def set_graph_for_tests(
-    graph: CompiledStateGraph[ChatTurnState, None, ChatTurnState, ChatTurnState]
-    | None,
+    graph: CompiledStateGraph[ChatTurnState, None, ChatTurnState, ChatTurnState] | None,
 ) -> None:
     """Test-only seam: replace the cached graph with a custom one.
 
@@ -169,9 +166,7 @@ async def post_chat(request: ChatRequest) -> ChatResponse:
                 source_url=url,
                 anchor=verified.get("anchor"),
                 snippet=str(snippet_value),
-                source_last_modified=cast(
-                    "datetime | None", last_mod_value
-                ),
+                source_last_modified=cast("datetime | None", last_mod_value),
                 liveness_status=verified["liveness_status"],
             )
         )

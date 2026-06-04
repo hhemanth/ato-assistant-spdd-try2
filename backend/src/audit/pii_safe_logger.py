@@ -214,9 +214,7 @@ class PIISafeLogger:
         # Strip the safe-list before scanning. Replacing with whitespace
         # of equal length preserves character offsets reported by
         # Presidio, which keeps the error message useful for debugging.
-        residue = REDACTION_TOKEN_REGEX.sub(
-            lambda m: " " * (m.end() - m.start()), text
-        )
+        residue = REDACTION_TOKEN_REGEX.sub(lambda m: " " * (m.end() - m.start()), text)
         analyzer = self._get_analyzer()
         results = analyzer.analyze(
             text=residue,
@@ -228,9 +226,7 @@ class PIISafeLogger:
         if not hits:
             return
         entity_types = [getattr(r, "entity_type", "?") for r in hits]
-        offsets = [
-            (getattr(r, "start", -1), getattr(r, "end", -1)) for r in hits
-        ]
+        offsets = [(getattr(r, "start", -1), getattr(r, "end", -1)) for r in hits]
         raise PIIRedactionGuardError(
             entity_types=entity_types,
             offsets=offsets,

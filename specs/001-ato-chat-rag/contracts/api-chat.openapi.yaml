@@ -1,0 +1,245 @@
+openapi: 3.1.0
+info:
+  title: ATO Assistant Backend API
+  version: 0.1.0
+  description: |
+    HTTP contract for the ATO Assistant backend. The frontend calls these
+    endpoints. The contract is the source of truth: the live FastAPI
+    application's generated OpenAPI MUST validate against this document
+    in CI (drift fails the build).
+  contact:
+    name: ATO Assistant project
+servers:
+  - url: https://{backend-host}
+    description: Railway deployment
+    variables:
+      backend-host:
+        default: ato-assistant.example.up.railway.app
+# Slice 1 / internal-preview deployment is anonymous-by-design (per
+# spec Assumptions: "Anonymous, no-login access for v1"). Declaring
+# `security: []` at the root explicitly tells the contract reader and
+# the redocly `security-defined` linter that no operation requires
+# authentication. Public-launch hardening will replace this with a real
+# scheme (Bearer token or session cookie) per the spec's "Deployment"
+# assumption.
+security: []
+paths:
+  /chat:
+    post:
+      operationId: postChat
+      summary: Ask a question. Returns a cited answer or a refusal.
+      description: |
+        Single-turn endpoint. The server runs the LangGraph pipeline
+        synchronously and returns either an `answer` payload (with
+        citations, confidence band, and per-answer disclaimer) or a
+        `refusal` payload (with reason code). The response NEVER returns
+        plaintext PII; PII detected in the input is masked or refused
+        before any downstream call.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: Successful answer or refusal. Body discriminates by `kind`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+        "400":
+          description: Malformed request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          description: Rate-limited.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal error. NOTE - a refusal is a 200 with kind=refusal, not a 500.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /system-info:
+    get:
+      operationId: getSystemInfo
+      summary: Transparency endpoint - model and index versions.
+      description: |
+        Per the constitution Additional Constraints (Model & retrieval
+        transparency). Used by auditors, the eval harness, and the
+        frontend "About" view.
+      responses:
+        "200":
+          description: System info.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemInfo"
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required: [text, session_id]
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 4000
+          description: User's question. Server runs the PII guard before any LLM call.
+        session_id:
+          type: string
+          format: uuid
+          description: Client-generated stable id for the browser session.
+    ChatResponse:
+      oneOf:
+        - $ref: "#/components/schemas/AnswerResponse"
+        - $ref: "#/components/schemas/RefusalResponse"
+      discriminator:
+        propertyName: kind
+        mapping:
+          answer: "#/components/schemas/AnswerResponse"
+          refusal: "#/components/schemas/RefusalResponse"
+    AnswerResponse:
+      type: object
+      required:
+        - kind
+        - query_id
+        - text
+        - citations
+        - confidence_band
+        - per_answer_disclaimer
+        - model_identity
+        - generated_at
+      properties:
+        kind:
+          type: string
+          enum: [answer]
+        query_id:
+          type: string
+          format: uuid
+        text:
+          type: string
+          description: Rendered answer. Contains inline citation markers like [1], [2] referring to `citations[i]`.
+        citations:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/Citation"
+        confidence_band:
+          type: string
+          enum: [high, medium, low]
+          description: Coarse confidence-and-correctness badge (FR-016).
+        per_answer_disclaimer:
+          type: string
+          description: Required per-answer disclaimer text (FR-003).
+        model_identity:
+          type: string
+          description: e.g., claude-sonnet-4-6.
+        generated_at:
+          type: string
+          format: date-time
+    Citation:
+      type: object
+      required: [index, source_url, snippet, liveness_status]
+      properties:
+        index:
+          type: integer
+          minimum: 1
+          description: Matches the [N] marker in `text`.
+        source_url:
+          type: string
+          format: uri
+          pattern: '^https://www\.ato\.gov\.au/'
+        anchor:
+          type: [string, "null"]
+        snippet:
+          type: string
+        source_last_modified:
+          type: [string, "null"]
+          format: date-time
+          description: From the page's Last-Modified header at index time.
+        liveness_status:
+          type: string
+          enum: [live, unknown, stale]
+    RefusalResponse:
+      type: object
+      required: [kind, query_id, reason_code, user_message, refused_at]
+      properties:
+        kind:
+          type: string
+          enum: [refusal]
+        query_id:
+          type: string
+          format: uuid
+        reason_code:
+          type: string
+          enum:
+            - no-source
+            - low-confidence
+            - citation-misalignment
+            - stale-source
+            - pii-integral
+            - pii-scanner-fail
+            - out-of-scope
+            - inappropriate
+            - personal-advice
+            - non-english
+        user_message:
+          type: string
+        refused_at:
+          type: string
+          format: date-time
+    SystemInfo:
+      type: object
+      required:
+        - llm_identity
+        - llm_version
+        - llm_region
+        - embedding_identity
+        - embedding_version
+        - embedding_region
+        - observability_identity
+        - observability_region
+        - index_version
+        - index_refreshed_at
+        - corpus_scope
+      properties:
+        llm_identity:
+          type: string
+        llm_version:
+          type: string
+        llm_region:
+          type: string
+        embedding_identity:
+          type: string
+        embedding_version:
+          type: string
+        embedding_region:
+          type: string
+        observability_identity:
+          type: string
+        observability_region:
+          type: string
+        index_version:
+          type: string
+        index_refreshed_at:
+          type: string
+          format: date-time
+        corpus_scope:
+          type: array
+          items: { type: string }
+          example: [www.ato.gov.au]
+    Error:
+      type: object
+      required: [error_code, message]
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string

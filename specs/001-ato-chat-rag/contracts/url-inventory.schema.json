@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ato-assistant.example/contracts/url-inventory.schema.json",
+  "title": "ATO Crawler URL Inventory",
+  "description": "Output schema for the crawler module (User Story 4). Each crawl_run produces one inventory document.",
+  "type": "object",
+  "required": ["crawl_run_id", "started_at", "finished_at", "seed_urls", "depth_cap", "rate_limit_qps", "user_agent", "entries", "summary"],
+  "properties": {
+    "crawl_run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "seed_urls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "pattern": "^https://www\\.ato\\.gov\\.au/"
+      },
+      "minItems": 1
+    },
+    "depth_cap": { "type": "integer", "minimum": 1 },
+    "rate_limit_qps": { "type": "number", "exclusiveMinimum": 0 },
+    "user_agent": {
+      "type": "string",
+      "description": "Project-identifying user agent (FR-020)."
+    },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Entry" }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["pages_visited", "pages_skipped_by_robots", "pages_failed", "leaf_count"],
+      "properties": {
+        "pages_visited": { "type": "integer", "minimum": 0 },
+        "pages_skipped_by_robots": { "type": "integer", "minimum": 0 },
+        "pages_failed": { "type": "integer", "minimum": 0 },
+        "leaf_count": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "Entry": {
+      "type": "object",
+      "required": ["url", "discovered_at", "crawl_depth", "http_status", "is_leaf", "is_robots_disallowed"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://www\\.ato\\.gov\\.au/"
+        },
+        "discovered_at": { "type": "string", "format": "date-time" },
+        "crawl_depth": { "type": "integer", "minimum": 0 },
+        "http_status": { "type": ["integer", "null"], "minimum": 100, "maximum": 599 },
+        "is_leaf": { "type": "boolean" },
+        "is_robots_disallowed": { "type": "boolean" },
+        "skip_reason": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

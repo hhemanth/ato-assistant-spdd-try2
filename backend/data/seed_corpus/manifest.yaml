@@ -1,0 +1,68 @@
+version: 1
+fetched_at: 2026-06-03T07:47:42Z
+user_agent: ato-assistant-seed-corpus/0.1 (+https://github.com/hhemanth/ato-assistant-opus-spdd)
+entries:
+  - slug: tax-free-threshold
+    title: "Tax-free threshold | Australian Taxation Office"
+    source_url: https://www.ato.gov.au/individuals-and-families/jobs-and-employment-types/working-as-an-employee/tax-free-threshold
+    fetched_at: 2026-06-03T07:47:42Z
+    http_status: 200
+    content_hash_sha256: e112a277964fd020de7706997c38be8c3b13b135e120c8631ac54e29e04936ad
+    bytes: 249972
+    notes: "Substituted from the originally-attempted path under /income-deductions-offsets-and-records/income-you-must-declare/ (404); current canonical lives under /jobs-and-employment-types/working-as-an-employee/."
+  - slug: individual-income-tax-rates
+    title: "Tax rates – Australian resident | Australian Taxation Office"
+    source_url: https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents
+    fetched_at: 2026-06-03T07:47:42Z
+    http_status: 200
+    content_hash_sha256: 4cc28fdc5729dcaf36d14a1e7ec4a97e2350eea3da5fc22e7496621113bfca0b
+    bytes: 685946
+    notes: ""
+  - slug: gst-basics
+    title: "GST - Goods and Services Tax | Australian Taxation Office"
+    source_url: https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst
+    fetched_at: 2026-06-03T07:47:43Z
+    http_status: 200
+    content_hash_sha256: c8d84cc8d3b3a6c1c64e1777391da1f815718163261924abcbe4f81f48be13f3
+    bytes: 262215
+    notes: ""
+  - slug: bas-basics
+    title: "Business activity statements (BAS) | Australian Taxation Office"
+    source_url: https://www.ato.gov.au/businesses-and-organisations/preparing-lodging-and-paying/business-activity-statements-bas
+    fetched_at: 2026-06-03T07:47:43Z
+    http_status: 200
+    content_hash_sha256: ff20163370ad080c5843439f379d8c26e3e5fc03ae4873a4d62f42311fe993f9
+    bytes: 267295
+    notes: ""
+  - slug: payg-instalments
+    title: "PAYG instalments | Australian Taxation Office"
+    source_url: https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/payg-instalments
+    fetched_at: 2026-06-03T07:47:43Z
+    http_status: 200
+    content_hash_sha256: 83f0eef77feb36f9e23e1338be42e6fe9ef35b8353362488cf84039dbc17f50a
+    bytes: 262250
+    notes: "Substituted from /preparing-lodging-and-paying/pay-as-you-go-instalments (404); located via sitemap.xml."
+  - slug: deductions-you-can-claim
+    title: "Deductions you can claim | Australian Taxation Office"
+    source_url: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/deductions-you-can-claim
+    fetched_at: 2026-06-03T07:47:43Z
+    http_status: 200
+    content_hash_sha256: 74d2cafef127a3e0bc0358eee8d0ec1923e921372485e92a90be05d5306a0092
+    bytes: 295564
+    notes: ""
+  - slug: concessional-contributions-cap
+    title: "Concessional contributions cap | Australian Taxation Office"
+    source_url: https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/super/growing-and-keeping-track-of-your-super/caps-limits-and-tax-on-super-contributions/concessional-contributions-cap
+    fetched_at: 2026-06-03T07:47:43Z
+    http_status: 200
+    content_hash_sha256: 0f8aa5be3c57ec436c4ca0340785fd2bd2347c8a071de002cc52f28c98fe42d7
+    bytes: 378590
+    notes: "Concessional contributions cap chosen as the canonical super-caps overview page."
+  - slug: small-business-cgt-concessions
+    title: "Small business CGT concessions | Australian Taxation Office"
+    source_url: https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/incentives-and-concessions/small-business-cgt-concessions
+    fetched_at: 2026-06-03T07:47:43Z
+    http_status: 200
+    content_hash_sha256: 81123117b596becc54b55f173d95c4371787fa3b44cc18acb3f64e818bdd3c7b
+    bytes: 258009
+    notes: "Substituted from /small-business-newsroom/concessions (404); small-business CGT concessions is the canonical overview hub for small business entity concessions."

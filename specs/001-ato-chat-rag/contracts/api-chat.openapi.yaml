@@ -15,6 +15,14 @@ servers:
     variables:
       backend-host:
         default: ato-assistant.example.up.railway.app
+# Slice 1 / internal-preview deployment is anonymous-by-design (per
+# spec Assumptions: "Anonymous, no-login access for v1"). Declaring
+# `security: []` at the root explicitly tells the contract reader and
+# the redocly `security-defined` linter that no operation requires
+# authentication. Public-launch hardening will replace this with a real
+# scheme (Bearer token or session cookie) per the spec's "Deployment"
+# assumption.
+security: []
 paths:
   /chat:
     post:
@@ -149,14 +157,12 @@ components:
           format: uri
           pattern: '^https://www\.ato\.gov\.au/'
         anchor:
-          type: string
-          nullable: true
+          type: [string, "null"]
         snippet:
           type: string
         source_last_modified:
-          type: string
+          type: [string, "null"]
           format: date-time
-          nullable: true
           description: From the page's Last-Modified header at index time.
         liveness_status:
           type: string

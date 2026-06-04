@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import sys
 from collections.abc import AsyncIterator, Iterator
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
@@ -38,14 +38,13 @@ if str(_BACKEND_SRC) not in sys.path:
 import pytest
 import pytest_asyncio
 
-
 # ---------------------------------------------------------------------------
 # Settings + DB fixtures
 # ---------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="session")
-def settings() -> "object":
+def settings() -> object:
     """Load process-wide :class:`Settings`; skip if env is incomplete."""
 
     try:
@@ -57,7 +56,7 @@ def settings() -> "object":
 
 
 @pytest.fixture()
-def async_db_url(settings: "object") -> str:
+def async_db_url(settings: object) -> str:
     """Return the supabase DB URL rewritten to use the psycopg3 async driver."""
 
     raw = str(settings.supabase_db_url)  # type: ignore[attr-defined]
@@ -73,7 +72,7 @@ def async_db_url(settings: "object") -> str:
 
 
 @pytest_asyncio.fixture()
-async def engine(async_db_url: str) -> "AsyncIterator[object]":
+async def engine(async_db_url: str) -> AsyncIterator[object]:
     """Create a transient async engine bound to the live Supabase DB.
 
     Every test that depends on this fixture is auto-skipped if the live
@@ -114,7 +113,7 @@ async def engine(async_db_url: str) -> "AsyncIterator[object]":
 
 
 @pytest_asyncio.fixture()
-async def db_session(engine: "object") -> "AsyncIterator[object]":
+async def db_session(engine: object) -> AsyncIterator[object]:
     """Yield a transactional async session that rolls back on exit.
 
     Pattern: open a connection, begin an outer transaction, bind a
@@ -165,7 +164,7 @@ _FAKE_ANSWER_TEXT = (
 
 
 @pytest.fixture()
-def mocked_anthropic() -> Iterator["object"]:
+def mocked_anthropic() -> Iterator[object]:
     """Stub the Anthropic Messages API with a deterministic reply.
 
     The reply body contains exactly one ``[1]`` marker and a matching
@@ -211,7 +210,7 @@ def voyage_embedding() -> list[float]:
 
 
 @pytest.fixture()
-def mocked_voyage(voyage_embedding: list[float]) -> Iterator["object"]:
+def mocked_voyage(voyage_embedding: list[float]) -> Iterator[object]:
     """Stub the Voyage embeddings endpoint with a deterministic vector."""
 
     try:
@@ -242,8 +241,8 @@ def mocked_voyage(voyage_embedding: list[float]) -> Iterator["object"]:
 
 @pytest_asyncio.fixture()
 async def seeded_chunks(
-    db_session: "object", voyage_embedding: list[float]
-) -> "AsyncIterator[dict[str, object]]":
+    db_session: object, voyage_embedding: list[float]
+) -> AsyncIterator[dict[str, object]]:
     """Insert one source_document + one chunk wired to the deterministic vector.
 
     Rolled back by ``db_session``'s outer transaction. Returns the inserted
@@ -258,7 +257,7 @@ async def seeded_chunks(
     source_repo = SourceDocumentRepo(db_session)  # type: ignore[arg-type]
     chunk_repo = ChunkRepo(db_session)  # type: ignore[arg-type]
 
-    fetched_at = datetime.now(tz=timezone.utc)
+    fetched_at = datetime.now(tz=UTC)
     doc = await source_repo.insert(
         source_url=_FAKE_ATO_URL,
         fetched_at=fetched_at,
@@ -301,10 +300,10 @@ async def seeded_chunks(
 
 @pytest_asyncio.fixture()
 async def test_graph(
-    db_session: "object",
-    mocked_anthropic: "object",
+    db_session: object,
+    mocked_anthropic: object,
     voyage_embedding: list[float],
-) -> "AsyncIterator[object]":
+) -> AsyncIterator[object]:
     """Build a LangGraph wired to a stub embedder + mocked Anthropic + the
     test's transactional session.
 
@@ -329,20 +328,21 @@ async def test_graph(
 
     from contextlib import asynccontextmanager
 
+    from anthropic import AsyncAnthropic
+
     from agents.graph import GraphDeps, build_graph  # type: ignore[import-not-found]
     from agents.retrieval.pgvector_client import (  # type: ignore[import-not-found]
         PgVectorClient,
     )
-    from anthropic import AsyncAnthropic
     from api.chat_route import set_graph_for_tests  # type: ignore[import-not-found]
 
     @asynccontextmanager
-    async def _session_cm() -> "AsyncIterator[object]":
+    async def _session_cm() -> AsyncIterator[object]:
         """Yield the test's transactional session without closing it."""
 
         yield db_session
 
-    def session_factory() -> "object":
+    def session_factory() -> object:
         return _session_cm()
 
     class _StubEmbedder:

@@ -61,7 +61,29 @@ line-length = 100
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "ASYNC", "S", "PL"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101"]
+# Tests routinely use bare ``assert`` (S101) and compare against magic
+# values like HTTP 200, top-k bounds, embedding dimensions, etc.
+# ``PLR2004`` (magic-value-comparison) does not model assertion-style
+# tests well — pulling every numeric literal into a named constant
+# obscures the intent of the assertion. Same rationale for
+# ``PLR0913`` (too-many-args) on test fixtures that pass through
+# many dependencies.
+"tests/*" = ["S101", "PLR2004", "PLR0913"]
+# conftest.py also needs to mutate ``sys.path`` BEFORE importing
+# modules that live in the ``src/`` layout — otherwise the imports
+# would fail at collection time. Ruff's ``E402`` (module-import-
+# not-at-top) does not understand this idiom; the imports are
+# deliberately below the sys.path hack and the file's docstring
+# explains why.
+"tests/conftest.py" = [
+  "S101",
+  "PLR2004",
+  "PLR0913",
+  "E402",      # sys.path hack must come before src/ imports
+  "PLC0415",   # lazy imports inside fixtures keep heavy SDKs off collection
+  "SIM105",    # `try/except/pass` in async teardowns reads more clearly than
+  "S110",      # `contextlib.suppress` and silent failure IS the intent here
+]
 # Repository CRUD methods have one keyword-only argument per table column
 # by design — ``PLR0913`` (too-many-args) does not model that shape well.
 # The package ``__init__`` also intentionally defers the ``config.settings``

@@ -10,24 +10,24 @@
  *      disclaimer text appears beneath it (FR-003 + Acceptance
  *      Scenario 4).
  *
- * Status: `test.fixme(true, ...)` — Slice 1 backend and frontend tasks
- * (T036-T056) are still pending, so running this spec for real would
- * always fail. `fixme` marks the test as known-pending so CI surfaces
- * it without going red until the stack is wired.
+ * Requires the local stack to be running:
+ *   - Backend on http://127.0.0.1:8000 with a populated seed corpus
+ *     (run `uv run python -m src.ingestion.seed_corpus_loader` once).
+ *   - Frontend dev server on http://localhost:3000.
+ * The answer round-trips through real Anthropic + Voyage, so the
+ * citation-visibility timeout is generous (20s).
  */
 
 import { test, expect } from '@playwright/test';
 
 test('US1 cited-answer happy path', async ({ page }) => {
-  test.fixme(true, 'Implementation pending — Slice 1 backend + frontend tasks');
-
   await page.goto('/');
 
   // Predominant disclaimer must be visible before any input is sent.
   await expect(
     page.getByText(/outside Australia/i, { exact: false }),
   ).toBeVisible();
-  await expect(page.getByText(/ato\.gov\.au/i, { exact: false })).toBeVisible();
+  await expect(page.getByText(/ato\.gov\.au/i, { exact: false }).first()).toBeVisible();
 
   // Submit a known-in-scope question.
   await page
@@ -35,11 +35,13 @@ test('US1 cited-answer happy path', async ({ page }) => {
     .fill('What is the tax-free threshold in Australia?');
   await page.getByRole('button', { name: /send|submit|ask/i }).click();
 
-  // Answer + citation link to ato.gov.au.
+  // Answer + citation link to ato.gov.au. The link's visible text is
+  // the URL path (host dropped for brevity) and the title is the full
+  // URL; the most direct selector is by href pattern.
   const citationLink = page
-    .getByRole('link', { name: /ato\.gov\.au/i })
+    .locator('a[href^="https://www.ato.gov.au/"]')
     .first();
-  await expect(citationLink).toBeVisible();
+  await expect(citationLink).toBeVisible({ timeout: 20_000 });
   await expect(citationLink).toHaveAttribute(
     'href',
     /^https:\/\/www\.ato\.gov\.au\//,
@@ -50,6 +52,6 @@ test('US1 cited-answer happy path', async ({ page }) => {
     page.getByText(/sourced from ato\.gov\.au/i, { exact: false }),
   ).toBeVisible();
   await expect(
-    page.getByText(/registered tax agent/i, { exact: false }),
+    page.getByText(/registered tax agent/i, { exact: false }).first(),
   ).toBeVisible();
 });

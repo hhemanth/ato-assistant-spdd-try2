@@ -169,7 +169,7 @@ class _Slice1PiiStub:
                 pii_detected=[],
                 language_detected="en",
             )
-            await session.flush()
+            await session.commit()
         # Update state with the row's actual UUID + masked_text mirror.
         return {
             **state,

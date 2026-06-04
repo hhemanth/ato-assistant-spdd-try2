@@ -403,6 +403,7 @@ class GenerationNode:
                 input_token_count=input_tokens,
                 output_token_count=output_tokens,
             )
+            await session.commit()
 
         answer_text, proposed_citations = _parse_response(response, chunks)
 

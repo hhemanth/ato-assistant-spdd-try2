@@ -135,7 +135,16 @@ async def db_session(engine: "object") -> "AsyncIterator[object]":
         except ProgrammingError as exc:
             pytest.skip(f"DB schema not applied (run 0001_initial_schema.sql): {exc}")
 
-        session = AsyncSession(bind=conn, expire_on_commit=False)
+        # ``join_transaction_mode="create_savepoint"`` makes
+        # ``session.commit()`` calls in production code (now required so
+        # graph nodes actually persist) release a SAVEPOINT rather than
+        # ending the outer transaction. The outer ``conn.rollback()`` at
+        # the end of the test still undoes everything the test wrote.
+        session = AsyncSession(
+            bind=conn,
+            expire_on_commit=False,
+            join_transaction_mode="create_savepoint",
+        )
         try:
             yield session
         finally:

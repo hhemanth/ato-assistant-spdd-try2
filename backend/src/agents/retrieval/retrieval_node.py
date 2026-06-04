@@ -155,6 +155,7 @@ class RetrievalNode:
                 input_token_count=None,
                 output_token_count=None,
             )
+            await session.commit()
 
         state["retrieval_id"] = retrieval_row.id
         state["retrieved_chunks"] = retrieved

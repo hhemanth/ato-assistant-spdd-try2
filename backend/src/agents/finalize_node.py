@@ -241,6 +241,7 @@ class FinalizeNode:
                 embedding_region=self._embedding_region,
                 observability_region=self._observability_region,
             )
+            await session.commit()
 
         state["verified_citations"] = verified
         return state
